@@ -12,6 +12,10 @@ contract LoteryTicket {
         lotteryId = 1;
     }
 
+    function getWinnerByLottery(uint id) public view returns (address payable){
+        return lotteryHistory[id];
+    }
+
     function getBalance() public view returns (uint) {
         return address(this).balance;
     }
@@ -34,9 +38,9 @@ contract LoteryTicket {
         uint index = getRandomNumber() % players.length;
         players[index].transfer(address(this).balance);
 
-        lotteryId++;
         lotteryHistory[lotteryId] = players[index];
-
+        lotteryId++;
+        
         players = new address payable[](0);
     }
 
