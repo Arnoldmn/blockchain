@@ -2,5 +2,6 @@
 pragma solidity ^0.8.12;
 
 contract Faucet {
-	receive() external payable {}
+
+    
 }
