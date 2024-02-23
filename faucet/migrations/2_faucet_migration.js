@@ -1,4 +1,4 @@
-var Faucet= artifacts.require("./FaucetContract");
+var Faucet= artifacts.require("./Faucet");
 
 module.exports = function(deployer) {
   deployer.deploy(Faucet);
