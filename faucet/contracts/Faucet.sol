@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract Faucet {
+import "./Owned.sol";
+
+contract Faucet is Owned{
 
     uint public numOfFunders;
     address public owner;
@@ -9,18 +11,6 @@ contract Faucet {
 
     mapping(address => bool) private funders;
     mapping(uint => address) private lutFunders;
-
-    constructor() {
-        owner = msg.sender;
-    }
-
-    modifier onlyOwner {
-        require(
-            msg.sender == owner, 
-            "Only owner can call this function"
-        );
-        _;
-    }
 
     modifier limitWithdraw(uint withdrawAmt) {
         require(
