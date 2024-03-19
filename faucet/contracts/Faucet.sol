@@ -20,6 +20,11 @@ contract Faucet {
         }
     }
 
+    function withdraw(uint withdrawAmt) external {
+        if (withdrawAmt < 1000000000000000000)
+        payable(msg.sender).transfer(withdrawAmt);
+    }
+    
     function getAllFunders() external view returns (address[] memory) {
         address[] memory _funders = new address[](numOfFunders);
 
