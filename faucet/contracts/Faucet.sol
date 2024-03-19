@@ -7,6 +7,14 @@ contract Faucet {
     mapping(address => bool) private funders;
     mapping(uint => address) private lutFunders;
 
+    modifier limitWithdraw(uint withdrawAmt) {
+        require(
+            withdrawAmt <= 100000000000000000,
+            "Cannot with more than 0.1 ether"
+        );
+        _;
+    }
+
     receive() external payable {}
 
     function addFunds() external payable {
@@ -20,8 +28,7 @@ contract Faucet {
         }
     }
 
-    function withdraw(uint withdrawAmt) external {
-         require(withdrawAmt <= 100000000000000000, "Cannot withdraw more than 0.1 ether");   
+    function withdraw(uint withdrawAmt) external limitWithdraw(withdrawAmt){
         
         payable(msg.sender).transfer(withdrawAmt);
     }
