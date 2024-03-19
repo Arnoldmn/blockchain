@@ -21,10 +21,11 @@ contract Faucet {
     }
 
     function withdraw(uint withdrawAmt) external {
-        if (withdrawAmt < 1000000000000000000)
+         require(withdrawAmt <= 100000000000000000, "Cannot withdraw more than 0.1 ether");   
+        
         payable(msg.sender).transfer(withdrawAmt);
     }
-    
+
     function getAllFunders() external view returns (address[] memory) {
         address[] memory _funders = new address[](numOfFunders);
 
