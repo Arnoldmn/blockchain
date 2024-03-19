@@ -4,8 +4,23 @@ pragma solidity ^0.8.19;
 contract Faucet {
 
     uint public numOfFunders;
+    address public owner;
+
+
     mapping(address => bool) private funders;
     mapping(uint => address) private lutFunders;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        require(
+            msg.sender == owner, 
+            "Only owner can call this function"
+        );
+        _;
+    }
 
     modifier limitWithdraw(uint withdrawAmt) {
         require(
