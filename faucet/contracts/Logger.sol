@@ -6,7 +6,7 @@ abstract contract Logger {
 
     uint public testNum;
     constructor() {
-        testNum = 1000;
+        testmNum = 1000;
     }
 
     function emitLog() public virtual returns(bytes32);
