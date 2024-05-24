@@ -27,7 +27,7 @@ contract Faucet is Owned, IFaucet{
         
         address funder = msg.sender;
 
-        if (!funders[funder]) {
+         if (!funders[funder]) {
             uint index = numOfFunders++;
             funders[funder] = true;
             lutFunders[index] = funder;
