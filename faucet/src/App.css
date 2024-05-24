@@ -4,3 +4,9 @@
     justify-content: center;
     align-items: center;
 }
+
+.faucet-wrapper > .btn {
+    padding: 10;
+    margin: auto;
+    height: 400;
+}
