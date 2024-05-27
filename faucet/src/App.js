@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css"
 import Web3 from "web3";
 import { provider } from "ganache";
+import detectEthereumProvider from "@metamask/detect-provider";
 
 function App() {
 
@@ -14,8 +15,7 @@ function App() {
 
   useEffect(() => {
     const loadProvider = async () => {
-
-      let provider = null;
+      const provider = await detectEthereumProvider()
 
       if (window.ethereum) {
         provider = window.ethereum;
