@@ -17,28 +17,15 @@ function App() {
     const loadProvider = async () => {
       const provider = await detectEthereumProvider()
 
-      if (window.ethereum) {
-        provider = window.ethereum;
-
-        try {
-          await provider.request({method: "eth_requestAccounts"});
-        } catch {
-          console.log("User denied access!")
-        }
+      if(provider) {
+        setWeb3Api({
+          web3: new Web3(provider),
+          provider
+        })
+      } else {
+        console.log("Please, install Metamask.")
       }
-      else if (window.web3) {
-        provider = window.web3.currentProvider;
-        
-      } 
-      else if (!process.env.production){
-        provider = new Web3.providers.HttpProvider("http://localhost:7545")
-      }
-        
-      setWeb3Api({
-        web3: new Web3(provider),
-        provider
-      })
-      
+    
     }
     loadProvider()
   }, [])
