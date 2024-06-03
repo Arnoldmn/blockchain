@@ -54,8 +54,8 @@ useEffect(() => {
             Current Balance: <strong>10</strong> ETH
           </div>
           
-          <button className="button mr-2">Donate</button>
-          <button className="button">Withdraw</button>
+          <button className="button is-primary is-light mr-2">Donate</button>
+          <button className="button is-link is-light">Withdraw</button>
         </div>
       </div>
     </>
