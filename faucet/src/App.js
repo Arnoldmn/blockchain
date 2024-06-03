@@ -16,8 +16,8 @@ function App() {
     const loadProvider = async () => {
       const provider = await detectEthereumProvider()
 
-      if(provider) {
-        provider.request({method: "eth_requestAccounts"})
+      if (provider) {
+        // provider.request({method: "eth_requestAccounts"})
         setWeb3Api({
           web3: new Web3(provider),
           provider
@@ -25,37 +25,46 @@ function App() {
       } else {
         console.log("Please, install Metamask.")
       }
-    
+
     }
     loadProvider()
   }, [])
 
-useEffect(() => {
-  const getAccount = async () => {
-    const accounts = await web3Api.web3.eth.getAccounts()
-    setAccounts(accounts[0])
-  }
+  useEffect(() => {
+    const getAccount = async () => {
+      const accounts = await web3Api.web3.eth.getAccounts()
+      setAccounts(accounts[0])
+    }
 
-  web3Api.web3 && getAccount()
-}, [web3Api.web3])
+    web3Api.web3 && getAccount()
+  }, [web3Api.web3])
 
   return (
 
     <>
       <div className="faucet-wrapper">
         <div className="faucet">
-          <span>
-            <strong>Account: </strong>
-          </span>
-          <h1>
-            { account ? account : "Not connected"}
-          </h1>
-          <div className="balance-view is-size-2">
+          <div className="is-flex is-align-items-center">
+            <span>
+              <strong className="mr-2">Account: </strong>
+            </span>
+
+            {account ? <div>{account}</div>
+              :
+              <button
+                className="button is-small "
+                onClick={() => 
+                web3Api.provider.request({method: "eth_requestAccounts"})}>
+                Connect wallet
+              </button>
+            }
+          </div>
+          <div className="balance-view is-size-2 my-4">
             Current Balance: <strong>10</strong> ETH
           </div>
-          
-          <button className="button is-primary is-light mr-2">Donate</button>
-          <button className="button is-link is-light">Withdraw</button>
+
+          <button className="button is-primary mr-2">Donate</button>
+          <button className="button is-link ">Withdraw</button>
         </div>
       </div>
     </>
