@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MIT
-
-pragma ^0.8.19;
+pragma solidity ^0.8.19;
 
 abstract contract Logger {
 
     uint public testNum;
     constructor() {
-        testmNum = 1000;
+        testNum = 1000;
     }
 
     function emitLog() public virtual returns(bytes32);

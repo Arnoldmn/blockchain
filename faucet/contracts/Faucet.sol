@@ -7,7 +7,7 @@ import "./IFaucet.sol";
 contract Faucet is Owned, IFaucet{
 
     uint public numOfFunders;
-    address public owner;
+    // address public owner;
 
 
     mapping(address => bool) private funders;
