@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState } from "react";
 import "./App.css"
 import Web3 from "web3";
