@@ -15,9 +15,14 @@ contract FundMe{
     function fund() public payable {
         require(msg.value.getConversionRate() > minimumUsd, "Didn't send enough funds");
         funders.push(msg.sender);
-        addressToAMountFunded[msg.sender] = addressToAMountFunded[msg.sender] + msg.value;
+        addressToAMountFunded[msg.sender] += msg.value;
     
     }
 
-   
+   function withdraw() public {
+        for (uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++){
+            address funder = funders[funderIndex];
+            addressToAMountFunded[funder] = 0;   
+        }
+   }
 }
