@@ -7,10 +7,15 @@ contract FundMe{
 
     uint256 public minimumUsd = 5 * (10 ** 18);
 
+    address[] public funders;
+    mapping(address funder => uint256 amountFunded) public addressToAMountFunded;
+
     
     function fund() public payable {
-        require(getConversionRate(msg.value) > minimumUsd, "Didn't send enough funda");
-        
+        require(getConversionRate(msg.value) > minimumUsd, "Didn't send enough funds");
+        funders.push(msg.sender);
+        addressToAMountFunded[msg.sender] = addressToAMountFunded[msg.sender] + msg.value;
+    
     }
 
     function getPrice() public view returns(uint256)  {
