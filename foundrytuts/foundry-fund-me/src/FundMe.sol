@@ -3,16 +3,17 @@ pragma solidity 0.8.24;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 library PriceConverter{
-     function getPrice() internal view returns(uint256)  {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0xfEefF7c3fB57d18C5C6Cdd71e45D2D0b4F9377bF);
+     function getPrice(AggregatorV3Interface priceFeed) internal view returns(uint256)  {
         (, int256 price,,,) = priceFeed.latestRoundData();
 
-        return uint256(price * 1e18);
+        return uint256(price * 1000000000000);
 
     }
 
-    function getConversionRate(uint256 ethAmount) internal  view returns(uint256) {
-        uint256 ethPrice = getPrice();
+    function getConversionRate(
+        uint256 ethAmount,
+        AggregatorV3Interface priceFeed) internal  view returns(uint256) {
+        uint256 ethPrice = getPrice(priceFeed);
         uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
 
         return ethAmountInUsd;
@@ -25,18 +26,21 @@ error FundMe__NotOwner();
 contract FundMe{
 
     using PriceConverter for uint256;
-    uint256 public constant MINIMUM_USD = 5 * (10 ** 18);
+    uint256 public constant MINIMUM_USD = 5E18;
 
     address[] public funders;
     mapping(address funder => uint256 amountFunded) public addressToAMountFunded;
 
     address public immutable i_owner;
-    constructor() {
+    AggregatorV3Interface public s_priceFeed;
+
+    constructor(address priceFeed) {
         i_owner = msg.sender;
+        s_priceFeed = AggregatorV3Interface(priceFeed);
     }
     
     function fund() public payable {
-        require(msg.value.getConversionRate() > MINIMUM_USD, "Didn't send enough funds");
+        require(msg.value.getConversionRate(s_priceFeed) > MINIMUM_USD, "Didn't send enough funds");
         funders.push(msg.sender);
         addressToAMountFunded[msg.sender] += msg.value;
     
@@ -44,7 +48,7 @@ contract FundMe{
 
     function getVervion() public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(0xfEefF7c3fB57d18C5C6Cdd71e45D2D0b4F9377bF);
-        return priceFeed.version();
+        return s_priceFeed.version();
     }
 
    function withdraw() public onlyOwner {
