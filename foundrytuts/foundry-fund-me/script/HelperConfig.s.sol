@@ -27,6 +27,13 @@ contract HelperConfig {
         return sepoliaConfig;
     }
 
+    function getMainnetEthConfig() public pure returns (NetworkConfig memory) {
+        NetworkConfig memory ethConfig = NetworkConfig({
+            priceFeed: 0x694AA1769357215DE4FAC081bf1f309aDC325306
+        });
+        return ethConfig;
+    }
+
     function getAnviEthConfig() public pure returns (NetworkConfig memory) {
 
     }
