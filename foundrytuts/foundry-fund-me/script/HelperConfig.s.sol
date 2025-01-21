@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 
 import {Script} from "forge-std/Script.sol";
 import {FundMe} from "../src/FundMe.sol";
+import {MockV3Aggregator} from "@chainlink/contracts/src/v0.6/tests/MockV3Aggregator.sol";
 
 contract HelperConfig {
     NetworkConfig public activeNetworkConfig;
@@ -37,6 +38,7 @@ contract HelperConfig {
     function getAnviEthConfig() public pure returns (NetworkConfig memory) {
         
         vm.startBroadcast();
+        MockV3Aggregator mockPriceFeed = new MockV3Aggregator(18, 200000000000);    
         vm.stopBroadcast();
     }
 }
