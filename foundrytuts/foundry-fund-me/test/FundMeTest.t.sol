@@ -28,5 +28,14 @@ contract FundMeTest is Test {
         uint256 version = fundMe.getVervion();
         assertEq(version, 4);
     }
+
+    function testFundFailsWithoutEnoughETH() public {
+        wm.expectRevert("Not enough ETH to fund");
+        try fundMe.fund() {
+            assert(false);
+        } catch Error(string memory reason) {
+            assertEq(reason, "Not enough ETH to fund");
+        }
+    }
 }
 

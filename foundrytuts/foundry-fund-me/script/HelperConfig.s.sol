@@ -39,6 +39,9 @@ contract HelperConfig {
     }
 
     function getAnviEthConfig() public pure returns (NetworkConfig memory) {
+        if(activeNetworkConfig.priceFeed != address(0)) {
+            return activeNetworkConfig;
+        }
         
         vm.startBroadcast();
         MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_PRICE);    
