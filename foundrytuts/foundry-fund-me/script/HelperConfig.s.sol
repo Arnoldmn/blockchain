@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.19;
 
 import {Script} from "forge-std/Script.sol";
 import {FundMe} from "../src/FundMe.sol";
+import {Vm} from "forge-std/Vm.sol";
 import {MockV3Aggregator} from "@chainlink/contracts/src/v0.6/tests/MockV3Aggregator.sol";
 
 contract HelperConfig {
@@ -15,6 +16,8 @@ contract HelperConfig {
     struct NetworkConfig {
         address priceFeed;
     }
+
+    Vm public vm = Vm(address(uint160(uint256(keccak256('hevm cheat code')))));
 
     constructor() {
         if (block.chainid == 11155111) {
@@ -38,7 +41,7 @@ contract HelperConfig {
         return ethConfig;
     }
 
-    function getAnviEthConfig() public pure returns (NetworkConfig memory) {
+    function getAnviEthConfig() public returns (NetworkConfig memory) {
         if(activeNetworkConfig.priceFeed != address(0)) {
             return activeNetworkConfig;
         }

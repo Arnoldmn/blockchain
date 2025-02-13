@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: MIT 
+// SPDX-License-Identifier: MIT
 // SPDX-License-Interface: MIT
 
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.19;
 
 import {Test, console} from "forge-std/Test.sol";
 import {FundMe} from "../src/FundMe.sol";
@@ -9,6 +9,9 @@ import {DeployFundMe} from "../script/DeployFundMe.s.sol";
 
 contract FundMeTest is Test {
     FundMe fundMe;
+
+    address USER = makeAddr("USER");
+    uint256 constant SEND_VALUE = 0.1 ether;
 
     function setUp() external {
         // fundMe = new FundMe(0x694aA7C8e6954b2F6f5bE6C3Fe3c3C7c5d8c5e6F);
@@ -30,12 +33,16 @@ contract FundMeTest is Test {
     }
 
     function testFundFailsWithoutEnoughETH() public {
-        wm.expectRevert("Not enough ETH to fund");
-        try fundMe.fund() {
-            assert(false);
-        } catch Error(string memory reason) {
-            assertEq(reason, "Not enough ETH to fund");
-        }
+       vm.expectRevert();
+       fundMe.fund();
+    }
+
+    function testFundUpdatesFundedDataStructure() public {
+
+        vm.prank(USER);
+        fundMe.fund{value: SEND_VALUE}();
+        uint256 amountFunded = fundMe.s_addressToAMountFunded(address(this));
+        assertEq(amountFunded, 10e18);
+        
     }
 }
-
