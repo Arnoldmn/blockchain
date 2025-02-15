@@ -42,7 +42,15 @@ contract FundMeTest is Test {
         vm.prank(USER);
         fundMe.fund{value: SEND_VALUE}();
         uint256 amountFunded = fundMe.s_addressToAMountFunded(address(this));
-        assertEq(amountFunded, 10e18);
+        assertEq(amountFunded, SEND_VALUE);
         
+    }
+
+    function testAddsFunderToArrayOffunders() public {
+        vm.prank(USER);
+        fundMe.fund{value: SEND_VALUE}();
+        address funders = fundMe.getFunders(0);
+    
+        assertEq(funders, USER);
     }
 }
