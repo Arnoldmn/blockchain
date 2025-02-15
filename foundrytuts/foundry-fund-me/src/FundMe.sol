@@ -1,38 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+
+import "./PriceConverter.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol";
 
-library PriceConverter {
-    function getPrice(
-        AggregatorV3Interface priceFeed
-    ) internal view returns (uint256) {
-        (, int256 price, , , ) = priceFeed.latestRoundData();
-
-        return uint256(price * 1000000000000);
-    }
-
-    function getConversionRate(
-        uint256 ethAmount,
-        AggregatorV3Interface priceFeed
-    ) internal view returns (uint256) {
-        uint256 ethPrice = getPrice(priceFeed);
-        uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
-
-        return ethAmountInUsd;
-    }
-}
-
 error FundMe__NotOwner();
+error FundMe__NotEnoughFunds();
+error FundMe__TransferFailed();
 
 contract FundMe {
     using PriceConverter for uint256;
-    uint256 public constant MINIMUM_USD = 5E18;
 
-    address[] public s_funders;
-    mapping(address => uint256) public s_addressToAMountFunded;
-
+    uint256 public constant MINIMUM_USD = 5e18;
     address public immutable i_owner;
-    AggregatorV3Interface public s_priceFeed;
+    AggregatorV3Interface public immutable s_priceFeed;
+
+    address[] private s_funders;
+    mapping(address => uint256) private s_addressToAmountFunded;
 
     constructor(address priceFeed) {
         i_owner = msg.sender;
@@ -40,48 +24,42 @@ contract FundMe {
     }
 
     function fund() public payable {
-        require(
-            msg.value.getConversionRate(s_priceFeed) > MINIMUM_USD,
-            "Didn't send enough funds"
-        );
+        uint256 ethAmountInUsd = msg.value.getConversionRate(s_priceFeed);
+        require(ethAmountInUsd >= MINIMUM_USD, "Not enough ETH sent!");
         s_funders.push(msg.sender);
-        s_addressToAMountFunded[msg.sender] += msg.value;
-    }
-
-    function getVervion() public view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(
-            0xfEefF7c3fB57d18C5C6Cdd71e45D2D0b4F9377bF
-        );
-        return s_priceFeed.version();
+        s_addressToAmountFunded[msg.sender] += msg.value;
     }
 
     function withdraw() public onlyOwner {
-        require(msg.sender == i_owner, "Must be the owner");
-
-        for (
-            uint256 funderIndex = 0;
-            funderIndex < s_funders.length;
-            funderIndex++
-        ) {
-            address s_funder = s_funders[funderIndex];
-            s_addressToAMountFunded[s_funder] = 0;
+        for (uint256 i = 0; i < s_funders.length; i++) {
+            address funder = s_funders[i];
+            s_addressToAmountFunded[funder] = 0;
         }
 
         s_funders = new address[](0);
+        (bool success, ) = payable(i_owner).call{value: address(this).balance}(
+            ""
+        );
+        if (!success) {
+            revert FundMe__TransferFailed();
+        }
+    }
 
-        payable(msg.sender).transfer(address(this).balance);
+    function getVersion() public view returns (uint256) {
+        return s_priceFeed.version();
+    }
 
-        bool sendSunccess = payable(msg.sender).send(address(this).balance);
-        require(sendSunccess, "Send failed");
+    function getAddressToAmountFunded(
+        address fundingAddress
+    ) public view returns (uint256) {
+        return s_addressToAmountFunded[fundingAddress];
+    }
 
-        (bool callSuccess, ) = payable(msg.sender).call{
-            value: address(this).balance
-        }("");
-        require(callSuccess, "Call failed");
+    function getFunders(uint256 index) public view returns (address) {
+        return s_funders[index];
     }
 
     modifier onlyOwner() {
-        // require(msg.sender == i_owner, "Sender is not owner!");
         if (msg.sender != i_owner) {
             revert FundMe__NotOwner();
         }
@@ -94,15 +72,5 @@ contract FundMe {
 
     fallback() external payable {
         fund();
-    }
-
-    function getAddressToAmountFunded(
-        address fundingAddress
-    ) public view returns (uint256) {
-        return s_addressToAMountFunded[fundingAddress];
-    }
-
-    function getFunders(uint256 index) public view returns (address) {
-        return s_funders[index];
     }
 }
