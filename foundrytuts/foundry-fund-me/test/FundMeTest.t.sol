@@ -7,7 +7,7 @@ import {DeployFundMe} from "../script/DeployFundMe.s.sol";
 
 contract FundMeTest is Test {
     FundMe fundMe;
-    
+
     address private USER = makeAddr("USER"); // Generate test address dynamically
     uint256 private constant SEND_VALUE = 0.1 ether;
     address private deployer;
@@ -29,7 +29,7 @@ contract FundMeTest is Test {
     function testPriceFeedVersionIsAccurate() public {
         uint256 version = fundMe.getVersion();
         console.log("Price Feed Version:", version); // Debugging output
-        require(version > 0, "Price feed version is invalid"); // Fix: Ensure version is greater than 0
+        assertGt(version, 0, "Price feed version should be greater than 0"); // Fix: Ensure version is greater than 0
     }
 
     function testFundFailsWithoutEnoughETH() public {
@@ -47,11 +47,22 @@ contract FundMeTest is Test {
     }
 
     function testAddsFunderToArrayOfFunders() public {
-        vm.deal(USER, SEND_VALUE); // Ensure USER has enough ETH
+        vm.deal(USER, SEND_VALUE);
         vm.prank(USER);
         fundMe.fund{value: SEND_VALUE}();
         address funder = fundMe.getFunders(0);
         console.log("First funder in array:", funder); // Debugging output
         assertEq(funder, USER);
+    }
+
+    function testWithOnlyOwnerCanWithdraw() public {
+        // USER funds the contract
+        vm.deal(USER, SEND_VALUE);
+        vm.prank(USER);
+        fundMe.fund{value: SEND_VALUE}();
+
+        vm.prank(USER);
+        vm.expectRevert();
+        fundMe.withdraw();
     }
 }
