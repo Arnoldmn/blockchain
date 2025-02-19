@@ -12,7 +12,7 @@ contract FundMe {
     using PriceConverter for uint256;
 
     uint256 public constant MINIMUM_USD = 5e18;
-    address public immutable i_owner;
+    address private immutable i_owner;
     AggregatorV3Interface public immutable s_priceFeed;
 
     address[] private s_funders;
@@ -59,6 +59,10 @@ contract FundMe {
         return s_funders[index];
     }
 
+    function getOwner() public view returns (address) {
+        return i_owner;
+    }
+    
     modifier onlyOwner() {
         if (msg.sender != i_owner) {
             revert FundMe__NotOwner();
